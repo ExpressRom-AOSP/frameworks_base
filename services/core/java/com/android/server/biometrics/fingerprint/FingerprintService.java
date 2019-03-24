@@ -128,6 +128,7 @@ public class FingerprintService extends BiometricServiceBase {
             }
         }
     }
+    private FacolaView mFacola;
 
     private final class FingerprintAuthClient extends AuthenticationClientImpl {
         @Override
@@ -177,6 +178,26 @@ public class FingerprintService extends BiometricServiceBase {
             }
 
             return super.handleFailedAttempt();
+        }
+
+        @Override
+        public boolean onAcquired(int acquiredInfo, int vendorCode) {
+            boolean result = super.onAcquired(acquiredInfo, vendorCode);
+            android.util.Log.d("PHH-Enroll", "acquired ret " + result);
+            if(result) mFacola.hide();
+            return result;
+        }
+
+        @Override
+        public int start() {
+            mFacola.show();
+            return super.start();
+        }
+
+        @Override
+        public int stop(boolean initiatedByClient) {
+            mFacola.hide();
+            return super.stop(initiatedByClient);
         }
     }
 
@@ -815,6 +836,7 @@ public class FingerprintService extends BiometricServiceBase {
         mAlarmManager = context.getSystemService(AlarmManager.class);
         context.registerReceiver(mLockoutReceiver, new IntentFilter(getLockoutResetIntent()),
                 getLockoutBroadcastPermission(), null /* handler */);
+        mFacola = new FacolaView(context);
 
         PackageManager packageManager = context.getPackageManager();
         mHasFod = packageManager.hasSystemFeature(LineageContextConstants.Features.FOD);
@@ -1066,6 +1088,7 @@ public class FingerprintService extends BiometricServiceBase {
             Slog.w(TAG, "startPreEnroll: no fingerprint HAL!");
             return 0;
         }
+        mFacola.show();
         try {
             return daemon.preEnroll();
         } catch (RemoteException e) {
@@ -1080,6 +1103,7 @@ public class FingerprintService extends BiometricServiceBase {
             Slog.w(TAG, "startPostEnroll: no fingerprint HAL!");
             return 0;
         }
+        mFacola.hide();
         try {
             return daemon.postEnroll();
         } catch (RemoteException e) {
