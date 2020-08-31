@@ -53,7 +53,7 @@ import android.os.ServiceManager;
 import android.util.DisplayMetrics;
 
 public class FacolaView extends ImageView implements OnTouchListener {
-    private final int mX, mY, mW, mH;
+    private int mX, mY, mW, mH;
     private final Paint mPaintFingerprint = new Paint();
     private final Paint mPaintShow = new Paint();
     private IXiaomiFingerprint mXiaomiFingerprint = null;
@@ -158,7 +158,7 @@ public class FacolaView extends ImageView implements OnTouchListener {
             mY = displayRealSize.y - mH/2 - oppoLocation;
             Slog.d("PHH-Enroll", "\tfacola at  " + mX + ", " + mY);
             noDim = true;
-         }
+        }
 
         String gammaStr = android.os.SystemProperties.get("persist.sys.phh.fod.gamma", "2.2");
         float gamma = Float.parseFloat(gammaStr);
@@ -404,7 +404,6 @@ public class FacolaView extends ImageView implements OnTouchListener {
                         mWM.addView(mFullGreen, mParamsTouched);
                     });
                 }
-
                 if(!isDown) {
                     isDown = true;
                     int nitValue = 2;
@@ -424,7 +423,7 @@ public class FacolaView extends ImageView implements OnTouchListener {
                      }, 200);
                 }
             } catch(Exception e) {
-                Slog.d("PHH-Enroll", "Failed calling fp extcmd");
+                Slog.d("PHH-Enroll", "Failed calling fp extcmd", e);
             }
             oppoPress(true);
         } else {
@@ -450,6 +449,7 @@ public class FacolaView extends ImageView implements OnTouchListener {
                 } catch(Exception e) {
                     Slog.d("PHH-Enroll", "Failed calling fp extcmd", e);
                 }
+
             }
             if(mFullGreenDisplayed) {
                 mHandler.post( () -> {
@@ -460,7 +460,6 @@ public class FacolaView extends ImageView implements OnTouchListener {
             }
         }
         canvas.drawCircle(mW/2, mH/2, (float) (mW/2.0f), this.mPaintShow);
-        }
     }
 
     @Override
